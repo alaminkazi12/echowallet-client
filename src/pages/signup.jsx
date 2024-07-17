@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
+import useAxiosPublic from "../hooks/useAxiosPublic";
+import { useState } from "react";
 
 const Signup = () => {
+  const axiosPublic = useAxiosPublic();
+  const [error, setError] = useState("");
   const handleSignUp = (e) => {
     e.preventDefault();
     const name = e.target.name.value;
@@ -15,7 +19,17 @@ const Signup = () => {
       pin: pin,
     };
 
-    console.log(userInfo);
+    axiosPublic
+      .post("/user", userInfo, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        if (res.data.message) {
+          setError(res.data.message);
+        } else if (res.data.insertedId) {
+          console.log("user added ");
+        }
+      });
   };
 
   return (
@@ -84,10 +98,11 @@ const Signup = () => {
           />
         </label>
 
-        <div className="flex w-full">
+        <div className="flex flex-col justify-center items-center w-full">
           <button className="btn btn-outline flex w-full text-xl uppercase border-green-700 text-green-700 hover:bg-green-700 hover:text-white">
             SignUP
           </button>
+          <p className="text-red-800 mt-2 capitalize">{error}</p>
         </div>
         <p className=" md:text-xl">
           Already have an account?
